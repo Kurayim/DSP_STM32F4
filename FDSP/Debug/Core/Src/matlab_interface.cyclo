@@ -1,6 +1,0 @@
-../Core/Src/matlab_interface.c:15:6:CreateBuffeSample	1
-../Core/Src/matlab_interface.c:122:6:CreateCommand	1
-../Core/Src/matlab_interface.c:242:6:AnalizeCommand	10
-../Core/Src/matlab_interface.c:329:19:MAT_Connect	5
-../Core/Src/matlab_interface.c:368:19:MAT_SendSamples	2
-../Core/Src/matlab_interface.c:401:19:MAT_EndSignal	1

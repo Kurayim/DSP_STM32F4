@@ -1,6 +1,0 @@
-../Core/Src/matlab_interface.c:15:6:CreateBuffeSample	32	static
-../Core/Src/matlab_interface.c:122:6:CreateCommand	32	static
-../Core/Src/matlab_interface.c:242:6:AnalizeCommand	24	static
-../Core/Src/matlab_interface.c:329:19:MAT_Connect	48	static
-../Core/Src/matlab_interface.c:368:19:MAT_SendSamples	72	dynamic
-../Core/Src/matlab_interface.c:401:19:MAT_EndSignal	40	static
