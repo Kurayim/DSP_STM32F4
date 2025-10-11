@@ -41,11 +41,11 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  18 .debug_line   00021ebf  00000000  00000000  0005ebb0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .debug_str    00091b28  00000000  00000000  00080a6f  2**0
+ 19 .debug_str    00091b5e  00000000  00000000  00080a6f  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 20 .debug_frame  0000613c  00000000  00000000  00112598  2**2
+ 20 .debug_frame  0000613c  00000000  00000000  001125d0  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 0000005a  00000000  00000000  001186d4  2**0
+ 21 .debug_line_str 0000005a  00000000  00000000  0011870c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -16605,6 +16605,11 @@ static void UART_EndRxTransfer(UART_HandleTypeDef *huart)
  80062d6:	681b      	ldr	r3, [r3, #0]
  80062d8:	330c      	adds	r3, #12
  80062da:	637b      	str	r3, [r7, #52]	; 0x34
+ */
+__STATIC_FORCEINLINE uint32_t __LDREXW(volatile uint32_t *addr)
+{
+    uint32_t result;
+
    __ASM volatile ("ldrex %0, %1" : "=r" (result) : "Q" (*addr) );
  80062dc:	6b7b      	ldr	r3, [r7, #52]	; 0x34
  80062de:	e853 3f00 	ldrex	r3, [r3]
@@ -16619,6 +16624,11 @@ static void UART_EndRxTransfer(UART_HandleTypeDef *huart)
  80062f2:	6cfa      	ldr	r2, [r7, #76]	; 0x4c
  80062f4:	643a      	str	r2, [r7, #64]	; 0x40
  80062f6:	63fb      	str	r3, [r7, #60]	; 0x3c
+ */
+__STATIC_FORCEINLINE uint32_t __STREXW(uint32_t value, volatile uint32_t *addr)
+{
+   uint32_t result;
+
    __ASM volatile ("strex %0, %2, %1" : "=&r" (result), "=Q" (*addr) : "r" (value) );
  80062f8:	6bf9      	ldr	r1, [r7, #60]	; 0x3c
  80062fa:	6c3a      	ldr	r2, [r7, #64]	; 0x40
