@@ -35,6 +35,25 @@ Expecting real-time performance comparable to that of a PC or a dedicated DSP pr
 
 Nevertheless, the main objective of this project is to demonstrate the implementation process of the Spectral Subtraction algorithm and to gain a deeper understanding of the steps involved in noise reduction on a resource-constrained platform.
 Instead of focusing solely on execution speed, the emphasis was placed on algorithmic correctness, structured implementation, and logical optimization within the system’s hardware limits.
+
+In this project, the audio data is processed in frames of 1024 samples with a 512-sample overlap between consecutive frames.
+Applying a window function and dividing the data into overlapping frames offers two essential advantages:
+
+It prevents artificial discontinuities or spectral breaks at frame boundaries, resulting in a smoother and more natural frequency spectrum after the FFT.
+
+It enables progressive reading of data from the SD card instead of loading the entire file into memory at once.
+This approach significantly optimizes RAM utilization and serves as the primary solution for overcoming the microcontroller’s memory limitations.
+
+At each processing step, after reading one frame, a Fast Fourier Transform (FFT) is applied.
+The FFT output, which consists of complex values, is decomposed into its magnitude and phase components.
+Since the goal in this stage is to estimate the average noise spectrum, the phase information is not used — only the magnitude values are considered for computation.
+
+All magnitude spectra corresponding to the noise frames are accumulated, and at the end of the process, the total is divided by the number of frames.
+The final result is a single averaged noise spectrum frame, representing the estimated mean noise characteristics extracted from the first four seconds of the input audio file.
+
+
+
+
 <br></br>
 
 
