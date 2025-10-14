@@ -26,6 +26,15 @@ As a result, it is not possible to load the entire file into memory at once.
 To overcome this limitation, the audio data must be processed incrementally.
 The samples are read from the SD card in segments, and both FFT and spectral processing are performed in a block-processing fashion.
 This approach enables efficient memory usage while maintaining the integrity and continuity of the audio signal during spectral analysis and reconstruction.
+
+Another major challenge in this project is the processing speed limitation.
+The STM32F411 microcontroller operates at a maximum frequency of 100 MHz, which is not sufficient for performing computationally intensive tasks such as Fast Fourier Transform (FFT) processing and real-time implementation of the Spectral Subtraction algorithm.
+
+During development, it became evident that this microcontroller is not inherently designed for heavy audio processing or high-rate spectral computation.
+Expecting real-time performance comparable to that of a PC or a dedicated DSP processor would therefore be unrealistic.
+
+Nevertheless, the main objective of this project is to demonstrate the implementation process of the Spectral Subtraction algorithm and to gain a deeper understanding of the steps involved in noise reduction on a resource-constrained platform.
+Instead of focusing solely on execution speed, the emphasis was placed on algorithmic correctness, structured implementation, and logical optimization within the system’s hardware limits.
 <br></br>
 
 
