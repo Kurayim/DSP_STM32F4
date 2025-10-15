@@ -54,7 +54,7 @@ The final result is a averaged noise spectrum frame, representing the estimated 
 <br></br>
 
 
-## ppdds
+## Calculation of Noise Frame Count
 ```c
   uint32_t NoiseNumSam = NOISE_SEC * SAMP_RATE;
   float32_t NumFrame = ((NoiseNumSam - FRAME_LEN) / HALF_FRAME) + 1;
