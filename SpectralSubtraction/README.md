@@ -156,8 +156,19 @@ During each iteration, the following steps are executed:
     The final result represents the mean noise spectrum estimated from the first four seconds of the input audio file.
     This averaged noise spectrum is later used in the spectral subtraction stage to remove background noise from the speech signal.
 
-n
+<br></br>
 
+## Calculating the Number of Frames for the Entire 7-Second Audio Segment
+In this part of the code, the total number of processable frames within the 7-second portion of the audio file is calculated as follows:
+
+```c
+NumFrame = (((R_WavremainData / 2) - FRAME_LEN) / HALF_FRAME) + 1;
+IndexFrame = NumFrame;
+```
+Since each audio sample is 16 bits (2 bytes), dividing R_WavremainData by 2 yields the total number of samples.
+By subtracting one frame length (FRAME_LEN, 1024 samples in this project) and dividing by the frame step size (HALF_FRAME, 512 samples, corresponding to a 50% overlap), and finally adding 1, the total number of frames that can be extracted from the 7-second segment is obtained.
+
+The variable IndexFrame is then initialized with the same value to serve as a counter for tracking the remaining frames during the signal processing loop in subsequent stages.
 
 
 
