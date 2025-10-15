@@ -123,7 +123,7 @@ At this point, a complete frame of 1024 continuous samples is formed, ready for 
 
 2. Applying the Hamming window
 
-The Hamming window is applied to the frame using the function WindowApply() to minimize discontinuities at frame boundaries and reduce spectral artifacts.
+    The Hamming window is applied to the frame using the function WindowApply() to minimize discontinuities at frame boundaries and reduce spectral artifacts.
 
 3. FFT computation
 
