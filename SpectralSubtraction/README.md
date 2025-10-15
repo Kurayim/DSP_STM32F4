@@ -75,7 +75,36 @@ The above formula determines how many overlapping frames can be extracted from t
 Finally, the variable IndexFrame is used as a counter to track the total number of frames available for reading and processing from the noise segment.
 
 
+```c
+ResultWave = WAVFIL_Start_Read( "Record_8.wav");
+  ResultWave = WAVFIL_Catch_Data(wav_in, &NumByteRead, HALF_FRAME);
 
+  CopyFloatArray(wav_in, Frame, HALF_FRAME);
+  ResetArray(NoiseSpectrum, HALF_FRAME);
+
+  while(IndexFrame != 0){
+
+  	  ResultWave = WAVFIL_Catch_Data(wav_in, &NumByteRead, HALF_FRAME);
+
+  	  CopyFloatArray(wav_in, &Frame[512], HALF_FRAME);
+
+  	  WindowApply(Frame, HammingWin, FRAME_LEN);
+
+  	  arm_rfft_fast_f32(&S, Frame, FFTOut, 0);
+
+   	  arm_cmplx_mag_f32(FFTOut, fftMagnitude, HALF_FRAME);
+
+   	  SumArray(NoiseSpectrum, fftMagnitude, HALF_FRAME);
+
+   	  CopyFloatArray(wav_in, Frame, HALF_FRAME);
+
+   	  IndexFrame--;
+  }
+
+  DivisionArray(NoiseSpectrum, NumFrame, HALF_FRAME);
+
+  ResultWave = WAVFIL_End_Read();
+```
 
 
 
