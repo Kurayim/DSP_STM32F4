@@ -64,11 +64,8 @@ In this part of the code, the number of processable frames within the first 4 se
 Explanation of variables:
 
 NOISE_SEC – duration of the noise segment in seconds (in this project, 4 seconds).
-
 SAMP_RATE – sampling rate of the input audio signal.
-
 FRAME_LEN – frame length in samples (here, 1024 samples per frame).
-
 HALF_FRAME – half of the frame length (512 samples), used to create a 50% overlap between consecutive frames.
 
 The above formula determines how many overlapping frames can be extracted from the noise portion of the signal.
