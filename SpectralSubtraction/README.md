@@ -118,45 +118,45 @@ During each iteration, the following steps are executed:
 
 1. Reading new data
 
-The next 512 samples are read from the SD card and stored in the second half of the Frame array (indices 512–1023).
-At this point, a complete frame of 1024 continuous samples is formed, ready for processing.
+    The next 512 samples are read from the SD card and stored in the second half of the Frame array (indices 512–1023).
+    At this point, a complete frame of 1024 continuous samples is formed, ready for processing.
 
 2. Applying the Hamming window
 
-    The Hamming window is applied to the frame using the function WindowApply() to minimize discontinuities at frame boundaries and reduce spectral artifacts.
+      The Hamming window is applied to the frame using the function WindowApply() to minimize discontinuities at frame boundaries and reduce spectral artifacts.
 
 3. FFT computation
 
-The Fast Fourier Transform (FFT) is then computed using the arm_rfft_fast_f32() function from the CMSIS-DSP library.
-The complex output is stored in the array FFTOut, where:
+    The Fast Fourier Transform (FFT) is then computed using the arm_rfft_fast_f32() function from the CMSIS-DSP library.
+    The complex output is stored in the array FFTOut, where:
 
-FFTOut[0] contains the real part of the first complex sample,
+    FFTOut[0] contains the real part of the first complex sample,
 
-FFTOut[1] contains the imaginary part,
-and this pattern continues in pairs throughout the array.
+    FFTOut[1] contains the imaginary part,
+    and this pattern continues in pairs throughout the array.
 
 4. Magnitude calculation
 
-To compute the magnitude spectrum, the function arm_cmplx_mag_f32() is used.
-It calculates the absolute magnitude of each complex sample from FFTOut and stores the results in the array fftMagnitude.
+    To compute the magnitude spectrum, the function arm_cmplx_mag_f32() is used.
+    It calculates the absolute magnitude of each complex sample from FFTOut and stores the results in the array fftMagnitude.
 
 5. Spectrum accumulation
 
-The magnitude spectrum obtained from each frame (fftMagnitude) is accumulated with the spectra of previous frames using the function SumArray().
-The cumulative result is stored in the NoiseSpectrum array.
+    The magnitude spectrum obtained from each frame (fftMagnitude) is accumulated with the spectra of previous frames using the function SumArray().
+    The cumulative result is stored in the NoiseSpectrum array.
 
 6. Preparing for the next frame
 
-The contents of wav_in are shifted to the beginning of Frame to form the next overlapping frame.
-The frame counter IndexFrame is decremented, and the loop continues until all noise frames are processed.
+    The contents of wav_in are shifted to the beginning of Frame to form the next overlapping frame.
+    The frame counter IndexFrame is decremented, and the loop continues until all noise frames are processed.
 
-At the end of the loop, the accumulated sum of all spectra is stored in NoiseSpectrum.
-To compute the average noise spectrum, the array values are divided by the total number of frames (NumFrame) using the function DivisionArray().
+    At the end of the loop, the accumulated sum of all spectra is stored in NoiseSpectrum.
+    To compute the average noise spectrum, the array values are divided by the total number of frames (NumFrame) using the function DivisionArray().
 
-The final result represents the mean noise spectrum estimated from the first four seconds of the input audio file.
-This averaged noise spectrum is later used in the spectral subtraction stage to remove background noise from the speech signal.
+    The final result represents the mean noise spectrum estimated from the first four seconds of the input audio file.
+    This averaged noise spectrum is later used in the spectral subtraction stage to remove background noise from the speech signal.
 
-
+n
 
 
 
