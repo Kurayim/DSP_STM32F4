@@ -176,3 +176,124 @@ The variable IndexFrame is then initialized with the same value to serve as a co
 
 
 
+
+
+
+
+
+
+
+
+
+
+## Noise Reduction and Speech Reconstruction (Spectral Subtraction Process)
+
+In this section of the code, the main objective is to utilize the previously obtained average noise spectrum (NoiseSpectrum) to suppress environmental noise and reconstruct the clean speech signal across the entire audio file.
+The overall process is similar to the noise spectrum estimation stage but includes crucial differences in the signal restoration and time-domain reconstruction phases.
+
+```c
+  ResultWave = WAVFIL_Catch_Data(wav_in, &NumByteRead, HALF_FRAME);
+
+  CopyFloatArray(wav_in, Frame, HALF_FRAME);
+  ResetArray(SignalMagnitud, HALF_FRAME);
+
+
+
+
+  while(IndexFrame != 0){
+
+	  ResultWave = WAVFIL_Catch_Data(wav_in, &NumByteRead, HALF_FRAME);
+
+	  CopyFloatArray(wav_in, &Frame[512], HALF_FRAME);
+
+	  WindowApply(Frame, HammingWin, FRAME_LEN);
+
+	  arm_rfft_fast_f32(&S, Frame, FFTOut, 0);
+
+	  arm_cmplx_mag_f32(FFTOut, SignalMagnitud, HALF_FRAME);
+
+	  ComputePhase(FFTOut, SignalPhase, HALF_FRAME);
+
+	  CleanMagnitude(CleanSpectrum, SignalMagnitud, NoiseSpectrum, HALF_FRAME);
+
+	  ApplySpectralFloor(CleanSpectrum, NoiseSpectrum, HALF_FRAME);
+
+//---------------------------------------------
+
+	  ComplexConvertPolarToAlgebraic(IFFTIn, CleanSpectrum, SignalPhase, HALF_FRAME);
+
+	  arm_rfft_fast_f32(&S, IFFTIn, CleanSampleNew, 1);
+
+	  WindowApply(CleanSampleNew, HammingWin, FRAME_LEN);
+
+
+	  if(LetOverlapFrame){
+
+		  SumArray(CleanSampleNew, CleanSampleOld, HALF_FRAME);
+		  SimpleCalArray(2, CleanSampleNew, CleanSampleNew, &WinSum[512], HALF_FRAME);
+
+	  }
+	  else{
+
+		  SimpleCalArray(2, CleanSampleNew, CleanSampleNew, WinSum, HALF_FRAME);
+
+	  }
+
+	  maxSample = 0.092862136481524f;
+	  DivisionArray(CleanSampleNew, maxSample, HALF_FRAME);
+	  GainApply(CleanSampleNew, Gain, HALF_FRAME);
+	  LimitClipp(CleanSampleNew, HALF_FRAME);
+
+	  ResultWave = WAVFIL_Give_Write(CleanSampleNew, HALF_FRAME);
+
+	  CopyFloatArray(&CleanSampleNew[512], CleanSampleOld, HALF_FRAME);
+
+	  IndexFrame--;
+	  LetOverlapFrame = true;
+
+	  CopyFloatArray(wav_in, Frame, HALF_FRAME);
+  }
+  if(IndexFrame == 0){
+
+	  SimpleCalArray(2, CleanSampleNew, CleanSampleNew, &WinSum[1024], HALF_FRAME);
+
+	  maxSample = 0.092862136481524f;
+	  DivisionArray(CleanSampleNew, maxSample, HALF_FRAME);
+	  GainApply(CleanSampleNew, Gain, HALF_FRAME);
+	  LimitClipp(CleanSampleNew, HALF_FRAME);
+
+	  ResultWave = WAVFIL_Give_Write(CleanSampleNew, HALF_FRAME);
+  }
+
+  ResultWave = WAVFIL_End_Read();
+  ResultWave = WAVFIL_End_Write();
+```
+
+Before entering the processing loop, the first 512 samples are read from the SD card and placed in the first half of the Frame array (indices 0–511).
+Then, the while loop iterates according to the number of available frames (IndexFrame).
+At the beginning of each iteration, another 512 new samples are read from the audio file and stored in the second half of the Frame array (indices 512–1023), completing one full frame.
+
+After the frame is formed, a Hamming window is applied using the WindowApply function to minimize discontinuities at frame boundaries.
+Next, the Fast Fourier Transform (FFT) is computed using the arm_rfft_fast_f32 function from the CMSIS-DSP library, and the complex output is stored in the FFTOut array.
+To extract spectral features, the arm_cmplx_mag_f32 and ComputePhase functions are used to calculate the magnitude and phase of the signal, respectively.
+Preserving the original phase is critical at this stage to ensure accurate waveform reconstruction when converting back to the time domain.
+
+In the next step, the average noise spectrum (NoiseSpectrum) is subtracted from the current signal spectrum using the CleanMagnitude function.
+To prevent excessive suppression of speech components, the ApplySpectralFloor function enforces a spectral floor, maintaining a minimum spectral level and reducing artificial distortion in the output.
+
+After spectral subtraction, the polar-domain data (magnitude and phase) are converted back to complex algebraic form using the ComplexConvertPolarToAlgebraic function.
+The Inverse FFT (IFFT) is then performed via arm_rfft_fast_f32 (in inverse mode), reconstructing the signal in the time domain, and the result is stored in the CleanSampleNew array.
+A Hamming window is applied again to smooth transitions between frames.
+
+To handle frame overlap, the Overlap-Add method is employed: only the first half of each frame (512 samples) is written to the SD card, while the second half is retained in CleanSampleOld for overlap with the next frame.
+This approach minimizes discontinuities between consecutive frames in the reconstructed audio signal.
+
+At the end of each iteration, amplitude normalization is performed using the DivisionArray function to control dynamic range and prevent clipping.
+If necessary, GainApply enhances the signal energy, and LimitClipp ensures that all sample values remain within valid limits, preventing signal saturation.
+
+The loop continues until IndexFrame reaches zero, meaning all frames have been processed.
+Finally, the reconstructed clean speech signal is saved to the SD card, and the WAVFIL_End_Read and WAVFIL_End_Write functions are called to properly close the read and write operations.
+
+
+
+
