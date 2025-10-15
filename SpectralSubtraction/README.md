@@ -49,14 +49,17 @@ The FFT output, which consists of complex values, is decomposed into its magnitu
 Since the goal in this stage is to estimate the average noise spectrum, the phase information is not used — only the magnitude values are considered for computation.
 
 All magnitude spectra corresponding to the noise frames are accumulated, and at the end of the process, the total is divided by the number of frames.
-The final result is a single averaged noise spectrum frame, representing the estimated mean noise characteristics extracted from the first four seconds of the input audio file.
-
-
-
+The final result is a averaged noise spectrum frame, representing the estimated mean noise characteristics extracted from the first four seconds of the input audio file.
 
 <br></br>
 
 
+## ppdds
+```c
+  uint32_t NoiseNumSam = NOISE_SEC * SAMP_RATE;
+  float32_t NumFrame = ((NoiseNumSam - FRAME_LEN) / HALF_FRAME) + 1;
+  float32_t IndexFrame   = NumFrame;
+```
 
 
 
